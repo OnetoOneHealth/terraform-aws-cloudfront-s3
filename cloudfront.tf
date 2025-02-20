@@ -2,10 +2,6 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
   comment = "${var.environment}-cloudfront-access-identity"
 }
 
-locals {
-  dns_alias = "${local.subdomain}.${var.dns_name}"
-}
-
 resource "aws_cloudfront_distribution" "web" {
   origin {
     domain_name = aws_s3_bucket.web.bucket_regional_domain_name
@@ -26,7 +22,7 @@ resource "aws_cloudfront_distribution" "web" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = var.default_root_object
-  aliases             = compact([var.enable_route53_record ? local.dns_alias : ""])
+  aliases             = compact([var.enable_route53_record ? var.dns_name : ""])
 
   default_cache_behavior {
     allowed_methods  = var.default_cache_behavior_allowed_methods

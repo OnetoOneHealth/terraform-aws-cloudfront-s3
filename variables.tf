@@ -24,8 +24,8 @@ variable "dns_name" {
   default     = ""
 }
 
-variable "subdomain" {
-  description = "By default the environment name is used as subdomain, set this variable to use a custom subdomain. No dots are supported yet."
+variable "dns_zone_name" {
+  description = "Zone in which to create route53 records"
   type        = string
   default     = ""
 }
