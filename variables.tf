@@ -1,3 +1,8 @@
+variable "organization" {
+  description = "Org name for humans."
+  type        = string
+}
+
 variable "environment" {
   description = "Logical name of the environment."
   type        = string
