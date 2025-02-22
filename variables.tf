@@ -96,9 +96,15 @@ variable "default_cache_behavior_compress" {
   default     = false
 }
 
+variable "default_cache_trusted_key_groups" {
+  description = "Trusted key groups for URL signing"
+  type        = list(string)
+  default     = []
+}
+
 variable "restrictions_geo_restriction_location" {
   description = "The ISO 3166-1-alpha-2 codes for which you want CloudFront either to distribute your content (whitelist) or not distribute your content (blacklist)."
-  type        = list
+  type        = list(any)
   default     = []
 }
 
@@ -137,4 +143,3 @@ variable "custom_error_response" {
   type        = list(map(string))
   default     = []
 }
-

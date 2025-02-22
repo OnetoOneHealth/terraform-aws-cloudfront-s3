@@ -23,12 +23,14 @@ resource "aws_cloudfront_distribution" "web" {
   is_ipv6_enabled     = true
   default_root_object = var.default_root_object
   aliases             = compact([var.enable_route53_record ? var.dns_name : ""])
+  comment             = local.bucket_name
 
   default_cache_behavior {
-    allowed_methods  = var.default_cache_behavior_allowed_methods
-    cached_methods   = var.default_cache_behavior_cached_methods
-    compress         = var.default_cache_behavior_compress
-    target_origin_id = "${var.environment}-${var.name}"
+    allowed_methods    = var.default_cache_behavior_allowed_methods
+    cached_methods     = var.default_cache_behavior_cached_methods
+    compress           = var.default_cache_behavior_compress
+    target_origin_id   = "${var.environment}-${var.name}"
+    trusted_key_groups = var.default_cache_trusted_key_groups
 
     forwarded_values {
       query_string = false
