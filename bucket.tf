@@ -18,10 +18,6 @@ resource "aws_s3_bucket" "web" {
   )
 }
 
-output "bucket_name" {
-  value = local.bucket_name
-}
-
 # Read the policy description for cloudfront access
 
 data "aws_iam_policy_document" "s3_policy" {
