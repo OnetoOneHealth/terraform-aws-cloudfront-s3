@@ -1,3 +1,25 @@
+locals {
+  bucket_name_default = "${var.organization}-${var.environment}-${var.name}"
+  bucket_name         = var.bucket_name == "" ? local.bucket_name_default : var.bucket_name
+}
+
+resource "aws_s3_bucket" "web" {
+  bucket        = local.bucket_name
+  force_destroy = var.bucket_force_destroy
+
+  tags = merge(
+    {
+      "Name" = local.bucket_name
+    },
+    {
+      "Environment" = var.environment
+    },
+    var.tags,
+  )
+}
+
+# Read the policy description for cloudfront access
+
 data "aws_iam_policy_document" "s3_policy" {
   statement {
     actions   = ["s3:GetObject"]
@@ -10,46 +32,56 @@ data "aws_iam_policy_document" "s3_policy" {
   }
 }
 
-data "aws_caller_identity" "current" {
-}
-
-locals {
-  bucket_name_default = "${data.aws_caller_identity.current.account_id}-${var.environment}-${var.name}"
-  bucket_name         = var.bucket_name == "" ? local.bucket_name_default : var.bucket_name
-}
-
 resource "aws_s3_bucket_policy" "web" {
   bucket = aws_s3_bucket.web.id
   policy = data.aws_iam_policy_document.s3_policy.json
 }
 
-resource "aws_s3_bucket" "web" {
-  bucket        = local.bucket_name
-  acl           = var.bucket_acl
-  force_destroy = var.bucket_force_destroy
+# Private access policies
 
-  tags = merge(
-    {
-      "Name" = format("%s", "Bucket for CloudFront ${var.environment}")
-    },
-    {
-      "Environment" = format("%s", var.environment)
-    },
-    var.tags,
-  )
-
-  versioning {
-    enabled = var.bucket_versioning
+resource "aws_s3_bucket_ownership_controls" "web" {
+  bucket = aws_s3_bucket.web.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
   }
+}
 
-  lifecycle_rule {
-    id      = "expire-old-versions"
-    prefix  = "*"
-    enabled = var.bucket_versioning
+resource "aws_s3_bucket_acl" "web" {
+  depends_on = [
+    aws_s3_bucket_ownership_controls.web
+  ]
 
-    noncurrent_version_expiration {
-      days = 7
+  bucket = aws_s3_bucket.web.id
+  acl    = var.bucket_acl
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "web" {
+  bucket = aws_s3_bucket.web.id
+
+  rule {
+    id     = "${local.bucket_name}-lifecycle"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+
+    noncurrent_version_transition {
+      noncurrent_days = 60
+      storage_class   = "GLACIER"
     }
   }
 }
 
+resource "aws_s3_bucket_versioning" "web" {
+  bucket = aws_s3_bucket.web.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
