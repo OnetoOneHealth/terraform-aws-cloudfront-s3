@@ -102,7 +102,7 @@ variable "default_cache_trusted_key_groups" {
   default     = []
 }
 
-variable "default_cache_viewer_req_fun_arn" {
+variable "default_cache_viewer_response_fun_arn" {
   type = string
 }
 
