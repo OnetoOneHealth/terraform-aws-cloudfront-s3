@@ -40,6 +40,11 @@ resource "aws_cloudfront_distribution" "web" {
       }
     }
 
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = var.default_cache_viewer_req_fun_arn
+    }
+
     viewer_protocol_policy = "redirect-to-https"
 
     min_ttl     = var.min_ttl

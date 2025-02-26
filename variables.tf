@@ -102,6 +102,10 @@ variable "default_cache_trusted_key_groups" {
   default     = []
 }
 
+variable "default_cache_viewer_req_fun_arn" {
+  type = string
+}
+
 variable "restrictions_geo_restriction_location" {
   description = "The ISO 3166-1-alpha-2 codes for which you want CloudFront either to distribute your content (whitelist) or not distribute your content (blacklist)."
   type        = list(any)
