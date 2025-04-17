@@ -19,6 +19,8 @@ resource "aws_cloudfront_distribution" "web" {
     }
   }
 
+  web_acl_id = var.aws_wafv2_web_acl_arn
+
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = var.default_root_object
