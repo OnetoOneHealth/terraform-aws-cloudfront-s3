@@ -147,3 +147,9 @@ variable "custom_error_response" {
   type        = list(map(string))
   default     = []
 }
+
+variable "aws_wafv2_web_acl_arn" {
+  description = "ARN of the WAFv2 webACL to be used for this CF distribution"
+  type = string
+  # CF distros should have a WAF for compliance purposes, so require a value
+}
